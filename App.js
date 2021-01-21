@@ -81,8 +81,8 @@ const App = () => {
     },
   ];
   const origin = {latitude: location.latitude, longitude: location.longitude};
-  const destination = {latitude: 16.079944, longitude: 108.233982};
-  const GOOGLE_MAPS_APIKEY = 'AIzaSyBed1ww2kXGTtFyI5B3uEitxhEjjQyKBSU';
+  const destination = {latitude: 16.050422, longitude: 108.230482};
+  const GOOGLE_MAPS_APIKEY = 'AIzaSyDGZOhb6qWmy1PLYJrLmtBho18Vasw0C_U';
   return location.latitude ? (
     <View style={styles.container}>
       <MapView
