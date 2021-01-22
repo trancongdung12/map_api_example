@@ -1,8 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
-//import liraries
-import React, {useState, useEffect} from 'react';
-import {View, ActivityIndicator, StyleSheet, Image, Text} from 'react-native';
-import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import React, { useState, useEffect } from 'react';
+import { View, ActivityIndicator, StyleSheet, Image, Text, TouchableOpacity } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import marker from './src/asset/marker.png';
 import MapViewDirections from 'react-native-maps-directions';
@@ -15,8 +14,9 @@ const ItemMarker = (props) => {
         longitude: props.longitude,
       }}
       title={props.title}
-      description={props.description}>
-      <Image source={marker} style={{width: 50, height: 50}} />
+      description={props.description}
+    >
+      <Image source={marker} style={{ width: 50, height: 50 }} />
     </Marker>
   );
 };
@@ -28,12 +28,16 @@ const App = () => {
     latitudeDelta: 0.03,
     longitudeDelta: 0.03,
   };
-
+  const initDistance = {
+    minute: null,
+    kilometer: null,
+  };
+  const [distance, setDistance] = useState(initDistance);
   const [location, setLocation] = useState(initialLocation);
   useEffect(() => {
     Geolocation.getCurrentPosition(
       (position) => {
-        const {longitude, latitude} = position.coords;
+        const { longitude, latitude } = position.coords;
         setLocation({
           ...location,
           latitude,
@@ -80,8 +84,8 @@ const App = () => {
       description: '1234 Foo Drive',
     },
   ];
-  const origin = {latitude: location.latitude, longitude: location.longitude};
-  const destination = {latitude: 16.050422, longitude: 108.230482};
+  const origin = { latitude: location.latitude, longitude: location.longitude };
+  const destination = { latitude: 16.050422, longitude: 108.230482 };
   const GOOGLE_MAPS_APIKEY = 'AIzaSyDGZOhb6qWmy1PLYJrLmtBho18Vasw0C_U';
   return location.latitude ? (
     <View style={styles.container}>
@@ -89,7 +93,8 @@ const App = () => {
         showsUserLocation
         provider={PROVIDER_GOOGLE}
         style={styles.map}
-        initialRegion={location}>
+        initialRegion={location}
+      >
         {markers.map((item, index) => (
           <ItemMarker
             key={index}
@@ -103,13 +108,28 @@ const App = () => {
           origin={origin}
           destination={destination}
           apikey={GOOGLE_MAPS_APIKEY}
-          strokeWidth={3}
+          strokeWidth={5}
           strokeColor="hotpink"
+          onReady={(result) => {
+            setDistance({
+              minute: Math.round(result.duration),
+              kilometer: Math.round(result.distance * 100) / 100,
+            });
+          }}
         />
       </MapView>
+      <View style={styles.viewDistance}>
+        <View style={styles.containDistance}>
+          <Text style={styles.textMinute}>{distance.minute} min </Text>
+          <Text style={styles.textDistance}> ({distance.kilometer} km)</Text>
+        </View>
+        <TouchableOpacity style={styles.buttonStart}>
+          <Text style={styles.textStart}>Start</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   ) : (
-    <ActivityIndicator style={{flex: 1}} size="large" color="green" />
+    <ActivityIndicator style={{ flex: 1 }} size="large" color="green" />
   );
 };
 
@@ -119,6 +139,37 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  viewDistance: {
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: 'white',
+    height: 100,
+    width: 360,
+    padding: 15,
+    alignItems: 'center',
+  },
+  containDistance: {
+    flexDirection: 'row',
+  },
+  textMinute: {
+    fontSize: 25,
+  },
+  textDistance: {
+    fontSize: 25,
+  },
+  buttonStart: {
+    marginTop: 5,
+    borderRadius: 25,
+    backgroundColor: 'red',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    width: 70,
+  },
+  textStart: {
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: '700',
   },
 });
 
