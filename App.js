@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet, Image, Text, TouchableOpacity } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Image, Text, TouchableOpacity, TextInput } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import marker from './src/asset/marker.png';
 import MapViewDirections from 'react-native-maps-directions';
-
+import Geocoder from 'react-native-geocoding';
 const ItemMarker = (props) => {
   return (
     <Marker
@@ -32,9 +32,15 @@ const App = () => {
     minute: null,
     kilometer: null,
   };
+  const initPosition = {
+    lat: null,
+    long: null,
+  };
   const [distance, setDistance] = useState(initDistance);
   const [location, setLocation] = useState(initialLocation);
+  const [position, setPosition] = useState(initPosition);
   useEffect(() => {
+    
     Geolocation.getCurrentPosition(
       (position) => {
         const { longitude, latitude } = position.coords;
@@ -49,9 +55,10 @@ const App = () => {
         timeout: 20000,
         maximumAge: 1000,
       },
-    );
+    ); 
+    
   }, []);
-
+  console.log(position);
   let markers = [
     {
       latitude: 16.073679,
@@ -86,7 +93,23 @@ const App = () => {
   ];
   const origin = { latitude: location.latitude, longitude: location.longitude };
   const destination = { latitude: 16.050422, longitude: 108.230482 };
-  const GOOGLE_MAPS_APIKEY = 'AIzaSyDGZOhb6qWmy1PLYJrLmtBho18Vasw0C_U';
+  //const GOOGLE_MAPS_APIKEY = 'AIzaSyDGZOhb6qWmy1PLYJrLmtBho18Vasw0C_U';
+  const GOOGLE_MAPS_APIKEY = 'AIzaSyBed1ww2kXGTtFyI5B3uEitxhEjjQyKBSU';
+  
+  const getPositionByAndress = (andress) => {
+    Geocoder.init(GOOGLE_MAPS_APIKEY, {language : "vi"}); 
+    Geocoder.from(andress)
+		.then(json => {
+      setPosition({
+        lat: json.results[0].geometry.location.lat,
+        long: json.results[0].geometry.location.lng,
+      })
+      console.log(position);
+      console.log("run");
+		})
+		.catch(error => console.warn(error));
+  }
+
   return location.latitude ? (
     <View style={styles.container}>
       <MapView
@@ -104,7 +127,15 @@ const App = () => {
             description={item.description}
           />
         ))}
-        <MapViewDirections
+          {/* <Marker
+        coordinate={{
+          latitude: position.lat,
+          longitude: position.long,
+        }}
+        title={"test get  andress"}
+        description={"props.description"}
+      /> */}
+        {/* <MapViewDirections
           origin={origin}
           destination={destination}
           apikey={GOOGLE_MAPS_APIKEY}
@@ -116,8 +147,12 @@ const App = () => {
               kilometer: Math.round(result.distance * 100) / 100,
             });
           }}
-        />
+        /> */}
       </MapView>
+      <View style={styles.viewAndress}>
+          <TextInput placeholder="Enter andress you want to go" />
+          <TouchableOpacity onPress={ () => getPositionByAndress}><Text>Tìm kiếm</Text></TouchableOpacity>
+      </View>
       <View style={styles.viewDistance}>
         <View style={styles.containDistance}>
           <Text style={styles.textMinute}>{distance.minute} min </Text>
@@ -139,6 +174,11 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  viewAndress: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    justifyContent: 'space-between',
   },
   viewDistance: {
     position: 'absolute',
