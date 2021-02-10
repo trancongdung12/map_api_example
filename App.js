@@ -6,6 +6,7 @@ import Geolocation from '@react-native-community/geolocation';
 import marker from './src/asset/marker.png';
 import MapViewDirections from 'react-native-maps-directions';
 import Geocoder from 'react-native-geocoding';
+import AdressPicker from './src/component/AdressPicker'
 const ItemMarker = (props) => {
   return (
     <Marker
@@ -150,8 +151,8 @@ const App = () => {
         /> */}
       </MapView>
       <View style={styles.viewAndress}>
-          <TextInput placeholder="Enter andress you want to go" />
-          <TouchableOpacity onPress={ () => getPositionByAndress}><Text>Tìm kiếm</Text></TouchableOpacity>
+      <AdressPicker/>
+      <AdressPicker/>
       </View>
       <View style={styles.viewDistance}>
         <View style={styles.containDistance}>
@@ -176,9 +177,10 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   viewAndress: {
-    flexDirection: 'row',
+    position: 'absolute',
+    flexDirection: 'column',
     backgroundColor: 'white',
-    justifyContent: 'space-between',
+    width: 400,
   },
   viewDistance: {
     position: 'absolute',
